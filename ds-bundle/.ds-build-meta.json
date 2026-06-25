@@ -1,0 +1,11 @@
+{
+  "namespace": "Booksphere",
+  "source": "booksphere-client@1.0.0",
+  "shape": "package",
+  "provider": "BooksphereProvider",
+  "componentCount": 52,
+  "skippedStoryIds": [],
+  "runtimeFontPrefixes": [
+    "Inter"
+  ]
+}

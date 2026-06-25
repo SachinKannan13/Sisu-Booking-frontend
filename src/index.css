@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   BookSphere Design System — Warm Editorial × Amber Signal
+   See /DESIGN_SYSTEM.md for the full spec. shadcn/ui primitives
+   read these CSS variables directly (bg-background, text-foreground,
+   border-border, etc. are wired in tailwind.config.js).
+   ============================================================ */
+:root {
+  --background: 42 38% 95%;        /* #f7f4ed cream page */
+  --foreground: 0 0% 11%;          /* #1c1c1c charcoal ink */
+
+  --card: 45 50% 97%;              /* #fbf9f3 lifted surface */
+  --card-foreground: 0 0% 11%;
+
+  --popover: 45 50% 97%;
+  --popover-foreground: 0 0% 11%;
+
+  --primary: 37 91% 55%;           /* #f5a623 amber — the one accent */
+  --primary-foreground: 0 0% 11%;
+
+  --secondary: 44 38% 92%;         /* #f3efe4 elevated/secondary surface */
+  --secondary-foreground: 0 0% 11%;
+
+  --muted: 45 17% 91%;             /* #eceae4 */
+  --muted-foreground: 60 1% 37%;   /* #5f5f5d */
+
+  --accent: 37 91% 55%;
+  --accent-foreground: 0 0% 11%;
+
+  --destructive: 1 52% 55%;        /* #c85250 */
+  --destructive-foreground: 45 50% 97%;
+
+  --success: 156 55% 39%;          /* #2d9b6f */
+  --success-foreground: 45 50% 97%;
+
+  --border: 45 17% 91%;            /* #eceae4 passive border */
+  --border-strong: 0 0% 11%;       /* charcoal — use border-border-strong/40 for rgba(28,28,28,0.4) */
+  --input: 45 17% 91%;
+
+  --radius: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: #f7f4ed;
+  color: #1c1c1c;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar — warm-neutral, not cold gray */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3efe4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d2c7;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b3a8;
+}
+
+/* GPU acceleration hint for animated elements */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Shimmer animation for loading */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(28,28,28,0) 0%,
+    rgba(28,28,28,0.06) 50%,
+    rgba(28,28,28,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Leaflet map overrides — warm-cream chrome around the map tiles */
+.leaflet-container {
+  background: #fbf9f3 !important;
+  border-radius: 12px;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #fbf9f3;
+  color: #1c1c1c;
+  border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+  background: #fbf9f3;
+}
+
+/* SVG visualization containers */
+.viz-container {
+  min-height: 220px;
+  background: radial-gradient(ellipse at center, #fbf9f3 0%, #f7f4ed 100%);
+}
+
+.viz-container svg {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+}
+
+/* Story slide text */
+.slide-prose {
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+/* ── Spin animation ─────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Hide scrollbar but keep scroll ────────────────────────────────── */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Horizontal strip scroll snapping ──────────────────────────────── */
+.strip-scroll {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+.strip-scroll > * { scroll-snap-align: start; }
+
+/* ── Line clamp utilities ───────────────────────────────────────────── */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

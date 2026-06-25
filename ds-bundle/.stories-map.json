@@ -1,0 +1,428 @@
+{
+  "global": "Booksphere",
+  "pkg": "booksphere-client",
+  "pkgDir": "D:\\SISU\\Client\\booksphere\\client",
+  "extraEntries": [],
+  "exported": [],
+  "storybookStatic": null,
+  "keyRecipe": 7,
+  "cfgSliceGlobal": "bbb8dfd229362b8fe46e95f7182cffb1430e20ad43c68bfb38f518e804a7c962",
+  "components": [
+    {
+      "name": "ActionPlanSlide",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "AdyarTheosophical",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "AnnaNagarTower",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "BesantNagarSunset",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "BoardroomPitch",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "BookCard",
+      "group": "book",
+      "srcSha": null,
+      "sourceKey": "06365b6a4ba97a1d",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "BookUpload",
+      "group": "book",
+      "srcSha": null,
+      "sourceKey": "ef78af57f321dadc",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "Button",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "8a66284d07055a56",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ChapterNav",
+      "group": "book",
+      "srcSha": null,
+      "sourceKey": "2df01bfc415110dd",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ChatInterface",
+      "group": "chat",
+      "srcSha": null,
+      "sourceKey": "66f6c5c14e80d0ad",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ChennaiCentralStation",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ChennaiMap",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "CoworkingSpace",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "DriftingClouds",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ECRCoastalRoad",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "FigureSilhouette",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "FortStGeorge",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "GenericHomeReflection",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "GenericOffice",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "GenreBadge",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "0fcf51b70c2dadd2",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "IITMResearchPark",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "InputWizard",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "KoyambeduMarket",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "MahabalipuramShoreTemple",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "MarinaBeach",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "MessageBubble",
+      "group": "chat",
+      "srcSha": null,
+      "sourceKey": "0890cf8426f8a304",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "MetroTrainInterior",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "Modal",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "c87b2287e6336389",
+      "cfgSlice": "f2aab668841055f980af73b8e33b861a65b30a3878f47561df8cf0c2dc14ac8c",
+      "stories": []
+    },
+    {
+      "name": "MonsoonStreet",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "MylaporeTemple",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "Navbar",
+      "group": "layout",
+      "srcSha": null,
+      "sourceKey": "0a7f83452e4b7c2a",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "NungambakkamCafe",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "OMRTechPark",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ParticleCanvas",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ParticleLayer",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ProcessingStatus",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "d62df5693f55512b",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ProfileSetup",
+      "group": "profile",
+      "srcSha": null,
+      "sourceKey": "fc85ac35fecc50f8",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "QuietWindowReflection",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ReadingBlock",
+      "group": "chat",
+      "srcSha": null,
+      "sourceKey": "c0698930f6149c30",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ReadingMode",
+      "group": "book",
+      "srcSha": null,
+      "sourceKey": "d6d4218b7d1ed140",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "RooftopNightView",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SceneRoot",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "Sidebar",
+      "group": "layout",
+      "srcSha": null,
+      "sourceKey": "78ee6674b2d6894a",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SkyBackground",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SlideCard",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SpinnerOverlay",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "57c648af3ebf48a6",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "StoryLoadingScreen",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "51427d5b6f04b339",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "StorySlideshow",
+      "group": "storytelling",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SunriseOverBay",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "TNagarStreet",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ValluvarKottam",
+      "group": "scenes",
+      "srcSha": null,
+      "sourceKey": "8864c620ea221946",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "VisualizationBlock",
+      "group": "chat",
+      "srcSha": null,
+      "sourceKey": "a54d1895bb7d8e65",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    }
+  ]
+}

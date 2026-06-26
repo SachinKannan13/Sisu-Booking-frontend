@@ -82,10 +82,12 @@ export const SOURCE_TYPE_COLORS = {
 
 // Insight type colors — used in LearningMemory's Insights tab
 export const INSIGHT_COLORS = {
-  observation: '#4a6fa5',
-  principle: '#f5a623',
-  question: '#c85250',
-  framework: '#7b5ea7',
-  reflection: '#2d9b6f',
-  experiment_result: '#2d6a8f'
+  observation:      '#4a6fa5',
+  principle:        '#f5a623',
+  question:         '#c85250',
+  framework:        '#7b5ea7',
+  reflection:       '#2d9b6f',
+  experiment_result:'#2d6a8f',
+  simulation:       '#8b5cf6',
+  experiment_idea:  '#059669',
 };

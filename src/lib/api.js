@@ -1,19 +1,24 @@
 import axios from 'axios';
 import supabase from './supabase.js';
 
-// Default timeout is 20 s for regular calls.
-// Upload / AI generation calls set their own timeout via config.
+// In dev, VITE_API_URL is unset → baseURL is '' → all /api/* requests go through
+// the Vite dev-server proxy (vite.config.js) to avoid CORS pre-flight issues.
+// In production, set VITE_API_URL to your backend domain.
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+  baseURL: import.meta.env.VITE_API_URL ?? '',
   timeout: 20000
 });
 
-// Attach auth token to every request
+// Attach auth token to every request.
+// Guard: if getSession() fails (network/timeout), skip the header rather than
+// hanging the entire request indefinitely.
 api.interceptors.request.use(async (config) => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    config.headers.Authorization = `Bearer ${session.access_token}`;
-  }
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
+  } catch (_) { /* non-fatal — server will return 401 if token is needed */ }
   return config;
 });
 
@@ -174,6 +179,10 @@ export const updateExperiment = (id, payload) =>
 
 export const captureExperimentLessons = (id, payload) =>
   api.post(`/api/lab/${id}/capture`, payload);       // backend: POST /api/lab/:id/capture
+
+// ── Simulation ────────────────────────────────────────────────────────
+export const runSimulation = (payload) =>
+  api.post('/api/simulate', payload, { timeout: 120000 });
 
 // ── Source detail ─────────────────────────────────────────────────────
 export const getSourceDetail = (id) => api.get(`/api/books/${id}`);

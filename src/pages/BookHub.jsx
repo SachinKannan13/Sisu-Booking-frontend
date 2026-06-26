@@ -26,6 +26,7 @@ export default function BookHub() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('read');
   const [targetChunk, setTargetChunk] = useState(null);
+  const [pinnedPassage, setPinnedPassage] = useState(null); // { text, chunkIndex }
 
   const genreConf = book ? getGenreConfig(book.genre) : null;
 
@@ -115,7 +116,7 @@ export default function BookHub() {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -123,15 +124,25 @@ export default function BookHub() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="h-full"
+            className="flex-1 flex flex-col min-h-0 overflow-hidden"
           >
             {activeTab === 'read' && (
-              <ReadingMode book={book} targetChunk={targetChunk} onTargetChunkConsumed={() => setTargetChunk(null)} />
+              <ReadingMode
+                book={book}
+                targetChunk={targetChunk}
+                onTargetChunkConsumed={() => setTargetChunk(null)}
+                onAskAboutPassage={(text, chunkIndex) => {
+                  setPinnedPassage({ text, chunkIndex });
+                  setActiveTab('chat');
+                }}
+              />
             )}
 
             {activeTab === 'chat' && (
               <ChatInterface
                 book={book}
+                pinnedPassage={pinnedPassage}
+                onPinnedPassageConsumed={() => setPinnedPassage(null)}
                 onJumpToPage={(chunkIndex) => {
                   setActiveTab('read');
                   setTargetChunk(chunkIndex);

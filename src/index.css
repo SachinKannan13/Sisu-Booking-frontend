@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap');
 @import 'leaflet/dist/leaflet.css';
 @tailwind base;
 @tailwind components;
@@ -95,6 +95,11 @@ body {
   animation: shimmer 2s linear infinite;
 }
 
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%            { transform: translateY(-5px); opacity: 1; }
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -154,7 +159,342 @@ body {
 }
 .strip-scroll > * { scroll-snap-align: start; }
 
+/* ══════════════════════════════════════════════════════════════════════
+   READER — Kindle-grade reading surface
+   Themes: light | sepia | night
+   Set data-reader-theme="sepia" (or "night") on the reader root element.
+   ══════════════════════════════════════════════════════════════════════ */
+.reader-root {
+  --reader-bg:        #fbf9f3;
+  --reader-text:      #1c1c1c;
+  --reader-border:    #eceae4;
+  --reader-muted:     #8f8a80;
+  --reader-highlight: #f5a62340;
+  --reader-highlight-border: #f5a623;
+  --reader-toolbar-bg: #ffffff;
+  --reader-font-serif: 'Lora', 'Georgia', 'Times New Roman', serif;
+  --reader-font-sans:  'Plus Jakarta Sans', ui-sans-serif, sans-serif;
+  --reader-line-height: 1.75;
+  --reader-measure: 68ch;
+  --reader-font-size: 18px;
+}
+
+.reader-root[data-reader-theme="sepia"] {
+  --reader-bg:        #f4ede1;
+  --reader-text:      #3b2f1e;
+  --reader-border:    #d9ccbb;
+  --reader-muted:     #7a6a55;
+  --reader-highlight: #d4a85440;
+  --reader-highlight-border: #c48a2e;
+  --reader-toolbar-bg: #ede1d0;
+}
+
+.reader-root[data-reader-theme="night"] {
+  --reader-bg:        #17171a;
+  --reader-text:      #d4cecc;
+  --reader-border:    #2e2e34;
+  --reader-muted:     #7a7683;
+  --reader-highlight: #8b7cf640;
+  --reader-highlight-border: #8b7cf6;
+  --reader-toolbar-bg: #1f1f24;
+}
+
+.reader-surface {
+  background: var(--reader-bg);
+  color: var(--reader-text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.reader-prose {
+  font-family: var(--reader-font-serif);
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+  max-width: var(--reader-measure);
+  margin: 0 auto;
+  color: var(--reader-text);
+  text-align: left;        /* left-aligned by default — no justify rivers */
+  hanging-punctuation: first;
+  -webkit-font-smoothing: antialiased;
+}
+
+.reader-prose p {
+  margin: 0 0 1.2em;
+  orphans: 3;
+  widows: 3;
+}
+
+.reader-prose p:last-child { margin-bottom: 0; }
+
+.reader-chapter-title {
+  font-family: var(--reader-font-serif);
+  font-size: 1.1em;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--reader-muted);
+  text-align: center;
+  margin-bottom: 2em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--reader-border);
+  letter-spacing: 0.01em;
+}
+
+/* Highlights rendered by the reader */
+.reading-highlight {
+  background: var(--reader-highlight);
+  border-bottom: 1.5px solid var(--reader-highlight-border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.reading-highlight:hover {
+  background: var(--reader-highlight);
+  filter: brightness(0.92);
+}
+
+/* Yellow highlight colour override */
+.reading-highlight[data-color="yellow"] {
+  background: #fef08a60;
+  border-bottom-color: #ca8a04;
+}
+.reading-highlight[data-color="blue"] {
+  background: #93c5fd40;
+  border-bottom-color: #3b82f6;
+}
+.reading-highlight[data-color="green"] {
+  background: #86efac40;
+  border-bottom-color: #16a34a;
+}
+.reading-highlight[data-color="pink"] {
+  background: #f9a8d440;
+  border-bottom-color: #db2777;
+}
+
+/* Floating selection toolbar */
+.reader-toolbar {
+  position: fixed;
+  z-index: 200;
+  background: var(--reader-toolbar-bg);
+  border: 1px solid var(--reader-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.07);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  transform: translateX(-50%);
+  pointer-events: all;
+  animation: toolbar-pop 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes toolbar-pop {
+  from { opacity: 0; transform: translateX(-50%) scale(0.92) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) scale(1)    translateY(0);   }
+}
+
+.reader-toolbar button {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--reader-text);
+  transition: background 0.12s ease;
+}
+
+.reader-toolbar button:hover { background: var(--reader-highlight); }
+.reader-toolbar .toolbar-divider { width: 1px; height: 20px; background: var(--reader-border); margin: 0 2px; }
+
+/* Page transition */
+@keyframes reader-page-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes reader-page-in-prev {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.reader-page-enter  { animation: reader-page-in      0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.reader-page-prev   { animation: reader-page-in-prev 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-page-enter, .reader-page-prev { animation: none; }
+  .reader-toolbar { animation: none; }
+}
+
 /* ── Line clamp utilities ───────────────────────────────────────────── */
 .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOTION TOKENS
+   Use var(--ease-out) etc. in inline JS (Framer Motion) and plain CSS.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);   /* fast start, gentle settle */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);   /* iOS-like drawer slide */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);/* playful with a touch of bounce */
+}
+
+/* ── Page enter ─────────────────────────────────────────────────────── */
+.page-enter {
+  animation: page-in 0.3s var(--ease-out) both;
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   AESTHETIC RISK — Paper grain texture
+   A very subtle SVG noise overlay at ~3 % opacity gives every surface
+   the tactile quality of slightly-textured paper.  Nothing in the UI
+   directly refers to it; users feel it without naming it.
+   ══════════════════════════════════════════════════════════════════════ */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 250px 250px;
+  mix-blend-mode: multiply;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   NIGHT MODE CASCADE
+   When ReadingMode.jsx sets data-reader-theme on <html>, the whole
+   app chrome darkens coherently with the Night reader palette.
+   ══════════════════════════════════════════════════════════════════════ */
+html[data-reader-theme="night"] body          { background-color: #17171a; color: #d4cecc; }
+html[data-reader-theme="night"] .ds-page      { background: #17171a; }
+html[data-reader-theme="night"] .ds-card      { background: #1f1f24; border-color: #2e2e34; }
+html[data-reader-theme="night"] .ds-card-sm   { background: #1f1f24; border-color: #2e2e34; }
+html[data-reader-theme="night"] .nav-bar      { background: #1f1f24 !important; border-bottom-color: #2e2e34 !important; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   DS-* DESIGN UTILITY CLASSES
+   These replace the recurring inline-style patterns across orphan pages.
+   Colours are hardcoded here (not CSS vars) so they work with or without
+   Tailwind's config — the canonical values are in DESIGN_SYSTEM.md.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Page shell */
+.ds-page {
+  min-height: 100vh;
+  background: #f7f4ed;
+  padding-bottom: 80px;
+}
+
+/* Max-width content columns */
+.ds-constrained    { max-width: 768px;  margin: 0 auto; padding: 32px 24px; }
+.ds-constrained-lg { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* Card surface */
+.ds-card {
+  background: #fbf9f3;
+  border: 1px solid #eceae4;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ds-card-sm {
+  background: #fbf9f3;
+  border: 1px solid #eceae4;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* Amber left-border accent (hypothesis, quote, distilled lesson) */
+.ds-insight-block {
+  background: #f3efe4;
+  border-left: 3px solid #f5a623;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+}
+
+/* Section eyebrow label */
+.ds-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8f8a80;
+}
+
+/* Amber spinner — the one consistent loading indicator */
+.ds-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(245,166,35,0.2);
+  border-top-color: #f5a623;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Full-page loading shell */
+.ds-page-loading {
+  min-height: 100vh;
+  background: #f7f4ed;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Back button (ghost text, no border) */
+.ds-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #5f5f5d;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 160ms var(--ease-out, ease-out);
+}
+.ds-back-btn:hover { color: #1c1c1c; }
+
+/* ── Button system ───────────────────────────────────────────────────
+   All buttons get scale(0.97) on :active — instant press feedback.
+   ──────────────────────────────────────────────────────────────────── */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out, ease-out),
+              background 160ms ease,
+              opacity 160ms ease;
+}
+.ds-btn:active:not(:disabled)  { transform: scale(0.97); }
+.ds-btn:disabled                { opacity: 0.45; cursor: default; }
+
+.ds-btn-amber { background: #f5a623; color: #1c1c1c; }
+.ds-btn-amber:hover:not(:disabled) { background: #e09520; }
+
+.ds-btn-dark  { background: #1c1c1c; color: #fbf9f3; }
+.ds-btn-dark:hover:not(:disabled)  { background: #2d2d2d; }
+
+.ds-btn-ghost { background: transparent; color: #5f5f5d; border: 1px solid #eceae4; }
+.ds-btn-ghost:hover:not(:disabled) { background: #f3efe4; color: #1c1c1c; }

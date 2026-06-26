@@ -1,39 +1,40 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Library, BookOpen, FlaskConical, BrainCircuit, Building2, Plus, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Library, BookOpen, FlaskConical, BrainCircuit, Building2, Plus, Upload, Link2, FileText, PenLine } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import supabase from '../../lib/supabase.js';
 import Modal from '../ui/Modal.jsx';
 import BookUpload from '../book/BookUpload.jsx';
 import URLIngester from '../source/URLIngester.jsx';
 import TextIngester from '../source/TextIngester.jsx';
-import { Upload, Link2, FileText, PenLine } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { to: '/library', label: 'Canon', icon: Library },
-  { to: '/learn', label: 'Learn', icon: BookOpen },
-  { to: '/lab', label: 'Lab', icon: FlaskConical },
-  { to: '/memory', label: 'Memory', icon: BrainCircuit },
-  { to: '/builder', label: 'Build', icon: Building2 },
+  { to: '/library', label: 'Canon',  icon: Library    },
+  { to: '/learn',   label: 'Learn',  icon: BookOpen   },
+  { to: '/lab',     label: 'Lab',    icon: FlaskConical },
+  { to: '/memory',  label: 'Memory', icon: BrainCircuit },
+  { to: '/builder', label: 'Build',  icon: Building2  },
 ];
 
 const INTAKE_TABS = [
-  { id: 'file', label: 'Upload File', icon: Upload },
-  { id: 'url', label: 'Paste URL', icon: Link2 },
+  { id: 'file', label: 'Upload File', icon: Upload  },
+  { id: 'url',  label: 'Paste URL',  icon: Link2   },
   { id: 'text', label: 'Paste Text', icon: FileText },
-  { id: 'note', label: 'Write Note', icon: PenLine },
+  { id: 'note', label: 'Write Note', icon: PenLine  },
 ];
 
+// Custom easing that matches the design-system token --ease-out
+const EASE_OUT = [0.23, 1, 0.32, 1];
+
 export default function Navbar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useApp();
-  const [addOpen, setAddOpen] = useState(false);
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const { user }  = useApp();
+  const [addOpen,   setAddOpen]   = useState(false);
   const [intakeTab, setIntakeTab] = useState('file');
 
-  const initials = user?.email
-    ? user.email.slice(0, 2).toUpperCase()
-    : '?';
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : '?';
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -44,141 +45,143 @@ export default function Navbar() {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
 
-  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
     <>
-      {/* Desktop + Tablet Navbar */}
-      <nav style={{
-        height: '64px', background: '#fbf9f3', borderBottom: '1px solid #eceae4',
-        display: 'flex', alignItems: 'center', padding: '0 24px', gap: '0',
-        position: 'sticky', top: 0, zIndex: 40
-      }}>
+      {/* ── Desktop + Tablet Navbar ── */}
+      <nav className="nav-bar h-16 bg-[#fbf9f3] border-b border-[#eceae4] flex items-center px-6 sticky top-0 z-40 backdrop-blur-sm">
+
         {/* Brand */}
-        <Link to="/library" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '20px', color: '#1c1c1c', letterSpacing: '-0.02em' }}>
-            Book<span style={{ color: '#f5a623' }}>Sphere</span>
+        <Link to="/library" className="no-underline flex-shrink-0">
+          <span className="font-bold text-[20px] text-[#1c1c1c] tracking-tight leading-none">
+            Book<span className="text-[#f5a623]">Sphere</span>
           </span>
         </Link>
 
-        {/* Center search */}
-        <div style={{ flex: 1, maxWidth: '480px', margin: '0 48px' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#8f8a80' }} />
+        {/* Center search — triggers command palette */}
+        <div className="flex-1 max-w-[480px] mx-12">
+          <div className="relative">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8a80] pointer-events-none" />
             <input
               placeholder="Search your canon..."
               onClick={openCmdPalette}
               readOnly
-              style={{
-                width: '100%', paddingLeft: '36px', paddingRight: '48px',
-                height: '38px', borderRadius: '999px',
-                border: '1px solid #eceae4', background: '#f3efe4',
-                fontSize: '13px', color: '#5f5f5d', cursor: 'pointer',
-                outline: 'none', boxSizing: 'border-box'
-              }}
+              className="w-full h-[38px] pl-9 pr-12 rounded-full border border-[#eceae4] bg-[#f3efe4]
+                         text-[13px] text-[#5f5f5d] cursor-pointer outline-none
+                         focus:border-[#d6d2c7] transition-colors duration-150"
             />
-            <kbd style={{
-              position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-              fontSize: '10px', color: '#8f8a80', border: '1px solid #eceae4',
-              borderRadius: '4px', padding: '1px 5px', background: '#fbf9f3', pointerEvents: 'none'
-            }}>K</kbd>
+            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#8f8a80]
+                            border border-[#eceae4] rounded px-1 py-px bg-[#fbf9f3] pointer-events-none">
+              ⌘K
+            </kbd>
           </div>
         </div>
 
-        {/* Desktop nav links */}
-        <div className="hidden md:flex" style={{ alignItems: 'center', gap: '28px', marginRight: '24px' }}>
+        {/* Desktop nav links — layout-animated active amber dot */}
+        <div className="hidden md:flex items-center gap-7 mr-6">
           {NAV_ITEMS.map(item => {
             const active = isActive(item.to);
             return (
-              <Link key={item.to} to={item.to} style={{
-                textDecoration: 'none', fontSize: '14px', fontWeight: active ? 600 : 400,
-                color: active ? '#f5a623' : '#5f5f5d',
-                transition: 'color 0.15s'
-              }}
-              onMouseEnter={e => { if (!active) e.target.style.color = '#1c1c1c'; }}
-              onMouseLeave={e => { if (!active) e.target.style.color = '#5f5f5d'; }}
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`relative no-underline text-[14px] pb-0.5 transition-colors duration-150
+                  ${active ? 'font-semibold text-[#f5a623]' : 'font-normal text-[#5f5f5d] hover:text-[#1c1c1c]'}`}
               >
                 {item.label}
+                {/* Animated underline indicator */}
+                {active && (
+                  <motion.span
+                    layoutId="nav-active-underline"
+                    className="absolute -bottom-[18px] left-0 right-0 h-[2px] bg-[#f5a623] rounded-full"
+                    transition={{ duration: 0.25, ease: EASE_OUT }}
+                  />
+                )}
               </Link>
             );
           })}
         </div>
 
-        {/* Avatar + sign out */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-          <button
+        {/* Add + Avatar + Sign out */}
+        <div className="flex items-center gap-2.5 ml-auto">
+          {/* + Add source button with press feedback */}
+          <motion.button
             onClick={() => setAddOpen(true)}
-            style={{
-              width: '32px', height: '32px', borderRadius: '50%', background: '#f5a623',
-              border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}
-            title="Add source"
+            whileTap={{ scale: 0.93 }}
+            transition={{ duration: 0.1, ease: EASE_OUT }}
+            className="w-8 h-8 rounded-full bg-[#f5a623] border-none cursor-pointer
+                       flex items-center justify-center
+                       hover:bg-[#e09520] transition-colors duration-150"
+            title="Add to your knowledge base (⌘+K)"
+            aria-label="Add source"
           >
-            <Plus size={16} color="#1c1c1c" />
-          </button>
-          <div style={{
-            width: '32px', height: '32px', borderRadius: '50%', background: '#1c1c1c',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '11px', fontWeight: 700, color: '#fbf9f3', cursor: 'default'
-          }}>
+            <Plus size={16} color="#1c1c1c" strokeWidth={2.5} />
+          </motion.button>
+
+          {/* User avatar */}
+          <div className="w-8 h-8 rounded-full bg-[#1c1c1c] flex items-center justify-center
+                          text-[11px] font-bold text-[#fbf9f3] select-none cursor-default"
+               title={user?.email}>
             {initials}
           </div>
+
           <button
             onClick={handleSignOut}
-            style={{ fontSize: '12px', color: '#8f8a80', background: 'none', border: 'none', cursor: 'pointer' }}
+            className="text-[12px] text-[#8f8a80] hover:text-[#5f5f5d] bg-transparent border-none
+                       cursor-pointer transition-colors duration-150 hidden sm:block"
           >
             Sign out
           </button>
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden" style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, height: '64px',
-        background: '#fbf9f3', borderTop: '1px solid #eceae4',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-        zIndex: 50, padding: '0 8px'
-      }}>
+      {/* ── Mobile Bottom Navigation ── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#fbf9f3]
+                      border-t border-[#eceae4] flex items-center justify-around z-50 px-2">
         {NAV_ITEMS.slice(0, 2).map(item => {
           const active = isActive(item.to);
-          const Icon = item.icon;
+          const Icon   = item.icon;
           return (
-            <Link key={item.to} to={item.to} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-              textDecoration: 'none', color: active ? '#f5a623' : '#8f8a80',
-              fontSize: '10px', fontWeight: active ? 600 : 400, flex: 1, padding: '8px 0'
-            }}>
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`flex flex-col items-center gap-0.5 no-underline text-[10px] flex-1 py-2
+                ${active ? 'font-semibold text-[#f5a623]' : 'font-normal text-[#8f8a80]'}`}
+            >
               <Icon size={20} />
               {item.label}
             </Link>
           );
         })}
 
-        {/* Center + button */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-          <button
+        {/* Center FAB */}
+        <div className="flex-1 flex justify-center">
+          <motion.button
             onClick={() => setAddOpen(true)}
-            style={{
-              width: '48px', height: '48px', borderRadius: '50%',
-              background: '#f5a623', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginTop: '-20px',
-              boxShadow: '0 4px 12px rgba(245,166,35,0.4)'
-            }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ duration: 0.1, ease: EASE_OUT }}
+            className="w-12 h-12 rounded-full bg-[#f5a623] border-none cursor-pointer
+                       flex items-center justify-center -mt-5
+                       shadow-[0_4px_16px_rgba(245,166,35,0.45)]
+                       hover:bg-[#e09520] transition-colors duration-150"
+            aria-label="Add source"
           >
-            <Plus size={22} color="#1c1c1c" />
-          </button>
+            <Plus size={22} color="#1c1c1c" strokeWidth={2.5} />
+          </motion.button>
         </div>
 
         {NAV_ITEMS.slice(2, 4).map(item => {
           const active = isActive(item.to);
-          const Icon = item.icon;
+          const Icon   = item.icon;
           return (
-            <Link key={item.to} to={item.to} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-              textDecoration: 'none', color: active ? '#f5a623' : '#8f8a80',
-              fontSize: '10px', fontWeight: active ? 600 : 400, flex: 1, padding: '8px 0'
-            }}>
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`flex flex-col items-center gap-0.5 no-underline text-[10px] flex-1 py-2
+                ${active ? 'font-semibold text-[#f5a623]' : 'font-normal text-[#8f8a80]'}`}
+            >
               <Icon size={20} />
               {item.label}
             </Link>
@@ -186,30 +189,46 @@ export default function Navbar() {
         })}
       </nav>
 
-      {/* Add Source Modal */}
-      <Modal open={addOpen} onClose={() => { setAddOpen(false); setIntakeTab('file'); }} title="Add to Your Knowledge Base" size="lg">
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid #eceae4', marginTop: '-4px' }}>
+      {/* ── Add Source Modal ── */}
+      <Modal
+        open={addOpen}
+        onClose={() => { setAddOpen(false); setIntakeTab('file'); }}
+        title="Add to Your Knowledge Base"
+        size="lg"
+      >
+        {/* Intake tab strip */}
+        <div className="flex gap-0 -mt-1 mb-5 border-b border-[#eceae4]">
           {INTAKE_TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setIntakeTab(tab.id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '8px 12px', fontSize: '13px', fontWeight: intakeTab === tab.id ? 600 : 500,
-                borderBottom: `2px solid ${intakeTab === tab.id ? '#f5a623' : 'transparent'}`,
-                color: intakeTab === tab.id ? '#f5a623' : '#5f5f5d',
-                background: 'none', border: 'none',
-                cursor: 'pointer', transition: 'all 0.15s'
-              }}
+              className={`flex items-center gap-1.5 px-3 py-2 text-[13px] border-none bg-transparent
+                         cursor-pointer transition-all duration-150
+                         border-b-2 -mb-px
+                         ${intakeTab === tab.id
+                           ? 'font-semibold text-[#f5a623] border-[#f5a623]'
+                           : 'font-medium text-[#5f5f5d] border-transparent hover:text-[#1c1c1c]'}`}
             >
-              <tab.icon size={13} /> {tab.label}
+              <tab.icon size={13} />
+              {tab.label}
             </button>
           ))}
         </div>
-        {intakeTab === 'file' && <BookUpload onUploaded={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
-        {intakeTab === 'url' && <URLIngester onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
-        {intakeTab === 'text' && <TextIngester onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
-        {intakeTab === 'note' && <TextIngester lockedType="note" onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={intakeTab}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15, ease: EASE_OUT }}
+          >
+            {intakeTab === 'file' && <BookUpload  onUploaded={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
+            {intakeTab === 'url'  && <URLIngester  onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
+            {intakeTab === 'text' && <TextIngester onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
+            {intakeTab === 'note' && <TextIngester lockedType="note" onIngested={() => setAddOpen(false)} onClose={() => setAddOpen(false)} />}
+          </motion.div>
+        </AnimatePresence>
       </Modal>
     </>
   );

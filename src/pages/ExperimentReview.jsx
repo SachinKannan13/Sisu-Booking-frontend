@@ -6,16 +6,18 @@ import Navbar from '../components/layout/Navbar.jsx';
 import { getExperiments, reviewExperiment, captureExperimentLessons } from '../lib/api.js';
 import toast from 'react-hot-toast';
 
+const EASE_OUT = [0.23, 1, 0.32, 1];
+
 export default function ExperimentReview() {
-  const { id } = useParams();
+  const { id }   = useParams();
   const navigate = useNavigate();
-  const [experiment, setExperiment] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [actualOutcome, setActualOutcome] = useState('');
+  const [experiment,     setExperiment]     = useState(null);
+  const [loading,        setLoading]        = useState(true);
+  const [actualOutcome,  setActualOutcome]  = useState('');
   const [lessonsLearned, setLessonsLearned] = useState('');
-  const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [reviewing, setReviewing] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [aiAnalysis,     setAiAnalysis]     = useState(null);
+  const [reviewing,      setReviewing]      = useState(false);
+  const [saving,         setSaving]         = useState(false);
 
   useEffect(() => {
     getExperiments()
@@ -47,9 +49,9 @@ export default function ExperimentReview() {
     setSaving(true);
     try {
       await captureExperimentLessons(id, {
-        actual_outcome: actualOutcome,
+        actual_outcome:  actualOutcome,
         lessons_learned: lessonsLearned || aiAnalysis?.lesson || '',
-        status: 'completed'
+        status:          'completed',
       });
       toast.success('Experiment completed and lessons saved!');
       navigate('/lab');
@@ -61,10 +63,10 @@ export default function ExperimentReview() {
   };
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#f7f4ed' }}>
+    <div className="ds-page-loading">
       <Navbar />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 64px)' }}>
-        <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid rgba(245,166,35,0.2)', borderTopColor: '#f5a623', animation: 'spin 0.8s linear infinite' }} />
+      <div className="flex-1 flex items-center justify-center">
+        <div className="ds-spinner" />
       </div>
     </div>
   );
@@ -72,108 +74,129 @@ export default function ExperimentReview() {
   if (!experiment) return null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f7f4ed', paddingBottom: '80px' }}>
+    <div className="ds-page">
       <Navbar />
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '32px 24px' }}>
-        <button onClick={() => navigate('/lab')} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#5f5f5d', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', marginBottom: '24px' }}>
+
+      <div className="ds-constrained page-enter">
+        {/* Back */}
+        <button onClick={() => navigate('/lab')} className="ds-back-btn mb-6">
           <ArrowLeft size={14} /> Back to Lab
         </button>
 
-        {/* Experiment card */}
-        <div style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1c1c1c', marginBottom: '16px' }}>{experiment.title || experiment.principle}</h1>
+        {/* Experiment header card */}
+        <div className="ds-card mb-5">
+          <h1 className="text-[22px] font-bold text-[#1c1c1c] mb-4 leading-tight">
+            {experiment.title || experiment.principle}
+          </h1>
 
           {experiment.hypothesis && (
-            <div style={{ marginBottom: '12px', padding: '12px 16px', background: '#f3efe4', borderRadius: '8px', borderLeft: '3px solid #f5a623' }}>
-              <p style={{ fontSize: '11px', fontWeight: 700, color: '#8f8a80', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Hypothesis</p>
-              <p style={{ fontSize: '14px', color: '#1c1c1c', lineHeight: 1.6 }}>{experiment.hypothesis}</p>
+            <div className="ds-insight-block mb-3">
+              <p className="ds-label mb-1">Hypothesis</p>
+              <p className="text-[14px] text-[#1c1c1c] leading-relaxed">{experiment.hypothesis}</p>
             </div>
           )}
 
           {experiment.predicted_outcome && (
-            <div style={{ padding: '12px 16px', background: '#4a6fa508', borderRadius: '8px', borderLeft: '3px solid #4a6fa5' }}>
-              <p style={{ fontSize: '11px', fontWeight: 700, color: '#8f8a80', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Predicted outcome</p>
-              <p style={{ fontSize: '14px', color: '#1c1c1c', lineHeight: 1.6 }}>{experiment.predicted_outcome}</p>
+            <div className="bg-[#4a6fa508] border-l-[3px] border-[#4a6fa5] rounded-r-lg px-4 py-3">
+              <p className="ds-label mb-1" style={{ color: '#4a6fa5' }}>Predicted outcome</p>
+              <p className="text-[14px] text-[#1c1c1c] leading-relaxed">{experiment.predicted_outcome}</p>
             </div>
           )}
         </div>
 
-        {/* Actual outcome */}
-        <div style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '16px', padding: '24px', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1c1c1c', marginBottom: '4px' }}>What actually happened?</h2>
-          <p style={{ fontSize: '13px', color: '#5f5f5d', marginBottom: '16px' }}>Be specific — compare against your hypothesis.</p>
+        {/* What actually happened */}
+        <div className="ds-card mb-4">
+          <h2 className="text-[16px] font-bold text-[#1c1c1c] mb-1">What actually happened?</h2>
+          <p className="text-[13px] text-[#5f5f5d] mb-4">Be specific — compare against your hypothesis.</p>
           <textarea
             value={actualOutcome}
             onChange={e => setActualOutcome(e.target.value)}
-            placeholder="I ran the experiment for... What I actually observed was..."
+            placeholder="I ran the experiment for… What I actually observed was…"
             rows={5}
-            style={{ width: '100%', padding: '12px', border: '1px solid #eceae4', borderRadius: '8px', fontSize: '14px', resize: 'vertical', background: '#f7f4ed', color: '#1c1c1c', lineHeight: 1.6, boxSizing: 'border-box' }}
+            className="w-full p-3 border border-[#eceae4] rounded-lg text-[14px] resize-y
+                       bg-[#f7f4ed] text-[#1c1c1c] leading-relaxed outline-none
+                       focus:border-[#d6d2c7] transition-colors duration-150 box-border"
           />
-          <button
+          <motion.button
             onClick={handleReview}
             disabled={reviewing || !actualOutcome.trim()}
-            style={{ marginTop: '12px', padding: '10px 20px', background: reviewing ? '#8f8a80' : '#1c1c1c', color: '#fbf9f3', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: reviewing ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: !actualOutcome.trim() ? 0.5 : 1 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.1 }}
+            className="mt-3 ds-btn ds-btn-dark"
+            style={{ opacity: (!actualOutcome.trim() || reviewing) ? 0.45 : 1 }}
           >
             <FlaskConical size={14} />
-            {reviewing ? 'Analyzing...' : 'Get AI analysis →'}
-          </button>
+            {reviewing ? 'Analysing…' : 'Get AI analysis →'}
+          </motion.button>
         </div>
 
         {/* AI Analysis */}
         {aiAnalysis && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-            style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '16px', padding: '24px', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1c1c1c', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Lightbulb size={16} style={{ color: '#f5a623' }} /> AI Analysis
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: EASE_OUT }}
+            className="ds-card mb-4"
+          >
+            <h2 className="text-[16px] font-bold text-[#1c1c1c] mb-4 flex items-center gap-2">
+              <Lightbulb size={16} className="text-[#f5a623]" />
+              AI Analysis
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ padding: '12px', background: '#4a6fa510', borderRadius: '8px' }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#4a6fa5', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>Predicted</p>
-                <p style={{ fontSize: '13px', color: '#1c1c1c', lineHeight: 1.5 }}>{experiment.predicted_outcome || '—'}</p>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-[#4a6fa510] rounded-lg p-3">
+                <p className="ds-label mb-1.5" style={{ color: '#4a6fa5' }}>Predicted</p>
+                <p className="text-[13px] text-[#1c1c1c] leading-relaxed">{experiment.predicted_outcome || '—'}</p>
               </div>
-              <div style={{ padding: '12px', background: '#2d9b6f10', borderRadius: '8px' }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#2d9b6f', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>Actual</p>
-                <p style={{ fontSize: '13px', color: '#1c1c1c', lineHeight: 1.5 }}>{actualOutcome}</p>
+              <div className="bg-[#2d9b6f10] rounded-lg p-3">
+                <p className="ds-label mb-1.5" style={{ color: '#2d9b6f' }}>Actual</p>
+                <p className="text-[13px] text-[#1c1c1c] leading-relaxed">{actualOutcome}</p>
               </div>
             </div>
 
             {aiAnalysis.gap_analysis && (
-              <div style={{ padding: '12px 16px', background: '#f3efe4', borderRadius: '8px', borderLeft: '3px solid #f5a623', marginBottom: '12px' }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#8f8a80', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Gap analysis</p>
-                <p style={{ fontSize: '13px', color: '#1c1c1c', lineHeight: 1.6 }}>{aiAnalysis.gap_analysis}</p>
+              <div className="ds-insight-block mb-3">
+                <p className="ds-label mb-1">Gap analysis</p>
+                <p className="text-[13px] text-[#1c1c1c] leading-relaxed">{aiAnalysis.gap_analysis}</p>
               </div>
             )}
+
             {aiAnalysis.lesson && (
-              <div style={{ padding: '12px 16px', background: '#fef3dc', borderRadius: '8px', borderLeft: '3px solid #f5a623' }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#a9690f', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Distilled lesson</p>
-                <p style={{ fontSize: '13px', color: '#1c1c1c', lineHeight: 1.6 }}>{aiAnalysis.lesson}</p>
+              <div className="bg-[#fef3dc] border-l-[3px] border-[#f5a623] rounded-r-lg px-4 py-3">
+                <p className="ds-label mb-1" style={{ color: '#a9690f' }}>Distilled lesson</p>
+                <p className="text-[13px] text-[#1c1c1c] leading-relaxed">{aiAnalysis.lesson}</p>
               </div>
             )}
           </motion.div>
         )}
 
-        {/* Lessons */}
-        <div style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '16px', padding: '24px', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1c1c1c', marginBottom: '4px' }}>Your lessons learned</h2>
-          <p style={{ fontSize: '13px', color: '#5f5f5d', marginBottom: '12px' }}>What will you do differently?</p>
+        {/* Lessons learned */}
+        <div className="ds-card mb-5">
+          <h2 className="text-[16px] font-bold text-[#1c1c1c] mb-1">Your lessons learned</h2>
+          <p className="text-[13px] text-[#5f5f5d] mb-3">What will you do differently?</p>
           <textarea
             value={lessonsLearned}
             onChange={e => setLessonsLearned(e.target.value)}
-            placeholder={aiAnalysis?.lesson || "What I'll take away from this is..."}
+            placeholder={aiAnalysis?.lesson || "What I'll take away from this is…"}
             rows={4}
-            style={{ width: '100%', padding: '12px', border: '1px solid #eceae4', borderRadius: '8px', fontSize: '14px', resize: 'vertical', background: '#f7f4ed', color: '#1c1c1c', lineHeight: 1.6, boxSizing: 'border-box' }}
+            className="w-full p-3 border border-[#eceae4] rounded-lg text-[14px] resize-y
+                       bg-[#f7f4ed] text-[#1c1c1c] leading-relaxed outline-none
+                       focus:border-[#d6d2c7] transition-colors duration-150 box-border"
           />
         </div>
 
-        <button
+        {/* Complete CTA */}
+        <motion.button
           onClick={handleSave}
           disabled={saving}
-          style={{ width: '100%', padding: '14px', background: '#f5a623', color: '#1c1c1c', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '15px', cursor: saving ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: saving ? 0.7 : 1 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.1 }}
+          className="w-full ds-btn ds-btn-amber rounded-xl"
+          style={{ padding: '14px', fontSize: '15px', opacity: saving ? 0.7 : 1 }}
         >
           <Save size={16} />
-          {saving ? 'Saving...' : 'Complete experiment and save lessons'}
-        </button>
+          {saving ? 'Saving…' : 'Complete experiment and save lessons'}
+        </motion.button>
       </div>
     </div>
   );

@@ -8,14 +8,16 @@ import { LEARNING_MODES, SOURCE_TYPE_COLORS } from '../constants/learningModes.j
 import { getGenreConfig } from '../utils/genreConfig.js';
 import toast from 'react-hot-toast';
 
+const EASE_OUT = [0.23, 1, 0.32, 1];
+
 export default function SourceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [source, setSource] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [source,          setSource]          = useState(null);
+  const [loading,         setLoading]         = useState(true);
   const [startingSession, setStartingSession] = useState(false);
-  const [selectedMode, setSelectedMode] = useState('scholar');
-  const [expandChapters, setExpandChapters] = useState(false);
+  const [selectedMode,    setSelectedMode]    = useState('scholar');
+  const [expandChapters,  setExpandChapters]  = useState(false);
 
   useEffect(() => {
     getBook(id)
@@ -28,9 +30,9 @@ export default function SourceDetail() {
     setStartingSession(true);
     try {
       const { data } = await createLearnSession({
-        topic: `Deep dive into: ${source.title}`,
-        mode: mode || selectedMode,
-        source_ids: [id]
+        topic:      `Deep dive into: ${source.title}`,
+        mode:       mode || selectedMode,
+        source_ids: [id],
       });
       navigate(`/learn/${data.id}`);
     } catch {
@@ -40,150 +42,215 @@ export default function SourceDetail() {
   };
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#f7f4ed' }}>
+    <div className="ds-page-loading">
       <Navbar />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 64px)' }}>
-        <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid rgba(245,166,35,0.2)', borderTopColor: '#f5a623', animation: 'spin 0.8s linear infinite' }} />
+      <div className="flex-1 flex items-center justify-center">
+        <div className="ds-spinner" />
       </div>
     </div>
   );
 
   if (!source) return null;
 
-  const genreConf = getGenreConfig(source.genre) || {};
+  const genreConf  = getGenreConfig(source.genre) || {};
   const coverColor = source.cover_color || genreConf.color || '#1a3a5c';
-  const modeConf = LEARNING_MODES.find(m => m.id === selectedMode) || LEARNING_MODES[0];
+  const modeConf   = LEARNING_MODES.find(m => m.id === selectedMode) || LEARNING_MODES[0];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f7f4ed', paddingBottom: '80px' }}>
+    <div className="ds-page">
       <Navbar />
 
-      {/* Hero */}
-      <div style={{ background: `linear-gradient(180deg, ${coverColor}22 0%, #f7f4ed 100%)`, borderBottom: '1px solid #eceae4', padding: '32px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <button onClick={() => navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#5f5f5d', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', marginBottom: '24px' }}>
+      {/* ── Hero gradient header ── */}
+      <div
+        className="border-b border-[#eceae4] px-6 py-8"
+        style={{ background: `linear-gradient(180deg, ${coverColor}22 0%, #f7f4ed 100%)` }}
+      >
+        <div className="max-w-[900px] mx-auto">
+          <button onClick={() => navigate(-1)} className="ds-back-btn mb-6">
             <ArrowLeft size={14} /> Back
           </button>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '32px', alignItems: 'flex-start' }}>
-            {/* Cover */}
-            <div style={{ width: '160px', height: '220px', borderRadius: '12px', background: `linear-gradient(160deg, ${coverColor}ee 0%, ${coverColor}66 100%)`, boxShadow: `0 16px 48px ${coverColor}44`, display: 'flex', alignItems: 'flex-end', padding: '12px', flexShrink: 0 }}>
-              <p style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', lineHeight: 1.3 }}>{source.title}</p>
-            </div>
+          <div className="grid gap-8" style={{ gridTemplateColumns: '160px 1fr' }}>
+            {/* Book cover slab */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: EASE_OUT }}
+              className="w-[160px] h-[220px] rounded-xl flex-shrink-0 flex items-end p-3"
+              style={{
+                background:  `linear-gradient(160deg, ${coverColor}ee 0%, ${coverColor}66 100%)`,
+                boxShadow:   `0 16px 48px ${coverColor}44`,
+              }}
+            >
+              <p className="text-[12px] font-bold text-white/90 leading-snug line-clamp-3">
+                {source.title}
+              </p>
+            </motion.div>
 
-            {/* Info */}
-            <div>
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            {/* Metadata */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.06, ease: EASE_OUT }}
+            >
+              {/* Badges */}
+              <div className="flex gap-2 flex-wrap mb-3">
                 {source.source_type && (
-                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: `${SOURCE_TYPE_COLORS[source.source_type] || '#5f5f5d'}18`, color: SOURCE_TYPE_COLORS[source.source_type] || '#5f5f5d', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span
+                    className="text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+                    style={{
+                      background: `${SOURCE_TYPE_COLORS[source.source_type] || '#5f5f5d'}18`,
+                      color:       SOURCE_TYPE_COLORS[source.source_type] || '#5f5f5d',
+                    }}
+                  >
                     {source.source_type}
                   </span>
                 )}
                 {genreConf.label && (
-                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '999px', background: `${genreConf.color || '#5f5f5d'}15`, color: genreConf.color || '#5f5f5d' }}>
+                  <span
+                    className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                    style={{ background: `${genreConf.color || '#5f5f5d'}15`, color: genreConf.color || '#5f5f5d' }}
+                  >
                     {genreConf.label}
                   </span>
                 )}
               </div>
 
-              <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#1c1c1c', lineHeight: 1.2, marginBottom: '8px' }}>{source.title}</h1>
-              <p style={{ fontSize: '16px', color: '#5f5f5d', marginBottom: '16px' }}>by {source.author || 'Unknown Author'}</p>
+              <h1 className="text-[28px] font-bold text-[#1c1c1c] leading-tight mb-2">{source.title}</h1>
+              <p className="text-[16px] text-[#5f5f5d] mb-4">by {source.author || 'Unknown Author'}</p>
 
               {source.summary && (
-                <p style={{ fontSize: '14px', color: '#5f5f5d', lineHeight: 1.7, marginBottom: '20px', maxWidth: '560px' }}>{source.summary}</p>
+                <p className="text-[14px] text-[#5f5f5d] leading-[1.7] mb-5 max-w-[560px]">
+                  {source.summary}
+                </p>
               )}
 
-              {/* Stats */}
-              <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                {source.word_count > 0 && (
-                  <div>
-                    <p style={{ fontSize: '20px', fontWeight: 700, color: '#1c1c1c' }}>{Math.round(source.word_count / 250)}</p>
-                    <p style={{ fontSize: '12px', color: '#8f8a80' }}>pages</p>
-                  </div>
-                )}
-                {source.total_chunks > 0 && (
-                  <div>
-                    <p style={{ fontSize: '20px', fontWeight: 700, color: '#1c1c1c' }}>{source.total_chunks}</p>
-                    <p style={{ fontSize: '12px', color: '#8f8a80' }}>chunks indexed</p>
-                  </div>
-                )}
-                {source.chapter_breakdown?.length > 0 && (
-                  <div>
-                    <p style={{ fontSize: '20px', fontWeight: 700, color: '#1c1c1c' }}>{source.chapter_breakdown.length}</p>
-                    <p style={{ fontSize: '12px', color: '#8f8a80' }}>chapters</p>
-                  </div>
-                )}
-              </div>
+              {/* Quick stats */}
+              {(source.word_count > 0 || source.total_chunks > 0 || source.chapter_breakdown?.length > 0) && (
+                <div className="flex gap-6 flex-wrap mb-6">
+                  {source.word_count > 0 && (
+                    <div>
+                      <p className="text-[20px] font-bold text-[#1c1c1c]">{Math.round(source.word_count / 250)}</p>
+                      <p className="text-[12px] text-[#8f8a80]">pages</p>
+                    </div>
+                  )}
+                  {source.total_chunks > 0 && (
+                    <div>
+                      <p className="text-[20px] font-bold text-[#1c1c1c]">{source.total_chunks}</p>
+                      <p className="text-[12px] text-[#8f8a80]">chunks indexed</p>
+                    </div>
+                  )}
+                  {source.chapter_breakdown?.length > 0 && (
+                    <div>
+                      <p className="text-[20px] font-bold text-[#1c1c1c]">{source.chapter_breakdown.length}</p>
+                      <p className="text-[12px] text-[#8f8a80]">chapters</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
-              {/* CTA */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                <button
+              {/* Primary CTAs */}
+              <div className="flex gap-2 flex-wrap mb-3">
+                <motion.button
                   onClick={() => handleStartSession(selectedMode)}
                   disabled={startingSession || source.status !== 'ready'}
-                  style={{ padding: '10px 24px', background: '#f5a623', color: '#1c1c1c', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', opacity: startingSession ? 0.7 : 1 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.1 }}
+                  className="ds-btn ds-btn-amber"
+                  style={{ opacity: startingSession ? 0.7 : 1 }}
                 >
-                  {startingSession ? 'Starting...' : `Start ${modeConf.label} session →`}
-                </button>
-                <button
+                  {startingSession ? 'Starting…' : `Start ${modeConf.label} session →`}
+                </motion.button>
+                <motion.button
                   onClick={() => navigate(`/book/${id}`)}
-                  style={{ padding: '10px 20px', background: '#fbf9f3', color: '#1c1c1c', border: '1px solid #eceae4', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.1 }}
+                  className="ds-btn ds-btn-ghost"
                 >
                   <BookOpen size={14} /> Read
-                </button>
+                </motion.button>
               </div>
 
-              {/* Mode pills */}
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {/* Mode picker */}
+              <div className="flex gap-1.5 flex-wrap">
                 {LEARNING_MODES.map(mode => (
-                  <button key={mode.id} onClick={() => setSelectedMode(mode.id)}
-                    style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '999px',
-                      border: `1px solid ${selectedMode === mode.id ? mode.color : '#eceae4'}`,
+                  <button
+                    key={mode.id}
+                    onClick={() => setSelectedMode(mode.id)}
+                    className="text-[11px] px-2.5 py-1 rounded-full border cursor-pointer
+                               transition-all duration-150"
+                    style={{
+                      border:     `1px solid ${selectedMode === mode.id ? mode.color : '#eceae4'}`,
                       background: selectedMode === mode.id ? `${mode.color}15` : 'transparent',
-                      color: selectedMode === mode.id ? mode.color : '#5f5f5d',
-                      cursor: 'pointer', fontWeight: selectedMode === mode.id ? 600 : 400 }}>
+                      color:      selectedMode === mode.id ? mode.color : '#5f5f5d',
+                      fontWeight: selectedMode === mode.id ? 600 : 400,
+                    }}
+                  >
                     {mode.label}
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '32px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* ── Body content ── */}
+      <div className="max-w-[900px] mx-auto px-6 py-8 grid gap-8"
+           style={{ gridTemplateColumns: '1fr 280px' }}>
+
+        {/* Left column */}
+        <div className="flex flex-col gap-6">
 
           {/* Chapters */}
           {source.chapter_breakdown?.length > 0 && (
             <section>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1c1c1c' }}>Chapters</h2>
-                <button onClick={() => setExpandChapters(!expandChapters)} style={{ fontSize: '12px', color: '#5f5f5d', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {expandChapters ? <><ChevronUp size={12} /> Collapse</> : <><ChevronDown size={12} /> Show all</>}
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-[16px] font-bold text-[#1c1c1c]">Chapters</h2>
+                <button
+                  onClick={() => setExpandChapters(!expandChapters)}
+                  className="text-[12px] text-[#5f5f5d] hover:text-[#1c1c1c] bg-transparent border-none
+                             cursor-pointer flex items-center gap-1 transition-colors duration-150"
+                >
+                  {expandChapters
+                    ? <><ChevronUp size={12} /> Collapse</>
+                    : <><ChevronDown size={12} /> Show all</>}
                 </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                {(expandChapters ? source.chapter_breakdown : source.chapter_breakdown.slice(0, 5)).map((ch, i) => (
-                  <div key={i} style={{ padding: '10px 12px', background: '#fbf9f3', borderRadius: '6px', borderLeft: `3px solid ${coverColor}`, marginBottom: '2px' }}>
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: '#1c1c1c' }}>{ch.chapter || `Chapter ${i + 1}`}</p>
-                    {ch.summary && <p style={{ fontSize: '12px', color: '#5f5f5d', marginTop: '2px', lineHeight: 1.5 }}>{ch.summary}</p>}
+              <div className="flex flex-col gap-0.5">
+                {(expandChapters
+                  ? source.chapter_breakdown
+                  : source.chapter_breakdown.slice(0, 5)
+                ).map((ch, i) => (
+                  <div
+                    key={i}
+                    className="px-3 py-2.5 bg-[#fbf9f3] rounded-md mb-0.5"
+                    style={{ borderLeft: `3px solid ${coverColor}` }}
+                  >
+                    <p className="text-[13px] font-semibold text-[#1c1c1c]">
+                      {ch.chapter || `Chapter ${i + 1}`}
+                    </p>
+                    {ch.summary && (
+                      <p className="text-[12px] text-[#5f5f5d] mt-0.5 leading-relaxed">{ch.summary}</p>
+                    )}
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          {/* Key quotes */}
+          {/* Key passages */}
           {source.key_quotes?.length > 0 && (
             <section>
-              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1c1c1c', marginBottom: '12px' }}>Key passages</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <h2 className="text-[16px] font-bold text-[#1c1c1c] mb-3">Key passages</h2>
+              <div className="flex flex-col gap-3">
                 {source.key_quotes.slice(0, 4).map((quote, i) => (
-                  <blockquote key={i} style={{ margin: 0, padding: '12px 16px', borderLeft: '3px solid #f5a623', background: '#fbf9f3', borderRadius: '0 8px 8px 0' }}>
-                    <p style={{ fontSize: '14px', color: '#1c1c1c', lineHeight: 1.7, fontStyle: 'italic' }}>"{typeof quote === 'string' ? quote : (quote.quote || quote.text || '')}"</p>
+                  <blockquote key={i} className="m-0 px-4 py-3 border-l-[3px] border-[#f5a623] bg-[#fbf9f3] rounded-r-lg">
+                    <p className="text-[14px] text-[#1c1c1c] leading-[1.7] italic">
+                      "{typeof quote === 'string' ? quote : (quote.quote || quote.text || '')}"
+                    </p>
                     {typeof quote !== 'string' && quote.speaker && (
-                      <p style={{ fontSize: '12px', color: '#8f8a80', marginTop: '6px' }}>— {quote.speaker}</p>
+                      <p className="text-[12px] text-[#8f8a80] mt-1.5">— {quote.speaker}</p>
                     )}
                   </blockquote>
                 ))}
@@ -193,13 +260,13 @@ export default function SourceDetail() {
         </div>
 
         {/* Right sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="flex flex-col gap-5">
           {source.themes?.length > 0 && (
-            <section style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '12px', padding: '16px' }}>
-              <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1c1c1c', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>Themes</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            <section className="ds-card-sm">
+              <h3 className="ds-label mb-2.5">Themes</h3>
+              <div className="flex flex-wrap gap-1.5">
                 {source.themes.map((theme, i) => (
-                  <span key={i} style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '999px', background: '#f3efe4', color: '#5f5f5d' }}>
+                  <span key={i} className="text-[12px] px-2.5 py-1 rounded-full bg-[#f3efe4] text-[#5f5f5d]">
                     {typeof theme === 'string' ? theme : (theme.name || theme.label || '')}
                   </span>
                 ))}
@@ -208,11 +275,11 @@ export default function SourceDetail() {
           )}
 
           {source.key_frameworks?.length > 0 && (
-            <section style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '12px', padding: '16px' }}>
-              <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1c1c1c', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>Frameworks</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <section className="ds-card-sm">
+              <h3 className="ds-label mb-2.5">Frameworks</h3>
+              <div className="flex flex-col gap-1.5">
                 {source.key_frameworks.slice(0, 5).map((fw, i) => (
-                  <p key={i} style={{ fontSize: '13px', color: '#5f5f5d', paddingLeft: '8px', borderLeft: '2px solid #f5a623' }}>
+                  <p key={i} className="text-[13px] text-[#5f5f5d] pl-2 border-l-2 border-[#f5a623] leading-snug">
                     {typeof fw === 'string' ? fw : (fw.name || fw.label || '')}
                   </p>
                 ))}
@@ -221,11 +288,11 @@ export default function SourceDetail() {
           )}
 
           {source.tags?.length > 0 && (
-            <section style={{ background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '12px', padding: '16px' }}>
-              <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1c1c1c', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>Tags</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            <section className="ds-card-sm">
+              <h3 className="ds-label mb-2.5">Tags</h3>
+              <div className="flex flex-wrap gap-1.5">
                 {source.tags.map((tag, i) => (
-                  <span key={i} style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '999px', background: '#1c1c1c', color: '#f7f4ed', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-[#1c1c1c] text-[#f7f4ed] flex items-center gap-1">
                     <Tag size={9} /> {tag}
                   </span>
                 ))}
@@ -234,8 +301,14 @@ export default function SourceDetail() {
           )}
 
           {source.source_url && (
-            <a href={source.source_url} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#4a6fa5', textDecoration: 'none', padding: '10px 14px', background: '#fbf9f3', border: '1px solid #eceae4', borderRadius: '8px' }}>
+            <a
+              href={source.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-[13px] text-[#4a6fa5] no-underline
+                         px-3.5 py-2.5 bg-[#fbf9f3] border border-[#eceae4] rounded-lg
+                         hover:border-[#4a6fa550] hover:bg-[#4a6fa508] transition-all duration-150"
+            >
               <ExternalLink size={13} /> View original source
             </a>
           )}

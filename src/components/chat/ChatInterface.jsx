@@ -11,7 +11,7 @@ import { getGenreConfig } from '../../utils/genreConfig.js';
 // Detects organic business intent in a typed message — no API call needed.
 const BUSINESS_INTENT_RE = /my (startup|business|company)|apply (this|it) to/i;
 
-export default function ChatInterface({ book, onJumpToPage }) {
+export default function ChatInterface({ book, onJumpToPage, pinnedPassage = null, onPinnedPassageConsumed }) {
   const { messages, sending, historyLoading, loadHistory, send, clear } = useChat(book.id);
   const [input, setInput] = useState('');
   const [pendingMode, setPendingMode] = useState('reading');
@@ -23,6 +23,15 @@ export default function ChatInterface({ book, onJumpToPage }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // When the reader sends a passage via "Ask AI about this", pre-fill the
+  // input with the passage as pinned context so the user can add their question.
+  useEffect(() => {
+    if (!pinnedPassage?.text) return;
+    setInput(`About this passage:\n"${pinnedPassage.text}"\n\n`);
+    onPinnedPassageConsumed?.();
+    setTimeout(() => textareaRef.current?.focus(), 100);
+  }, [pinnedPassage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSend = async () => {
     if (!input.trim() || sending) return;

@@ -242,20 +242,38 @@ export default function LearningSession() {
             </motion.div>
           ))}
 
-          {asking && streamingText && (
-            <div style={{ padding: '16px 24px', background: '#fbf9f3', borderLeft: '3px solid #f5a623', margin: '0 24px 16px', borderRadius: '0 8px 8px 0' }}>
-              <p style={{ fontSize: '14px', color: '#1c1c1c', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                {streamingText}
-                <span style={{ display: 'inline-block', width: '2px', height: '14px', background: '#f5a623', marginLeft: '2px', verticalAlign: 'text-bottom' }} />
-              </p>
-            </div>
-          )}
-
-          {asking && !streamingText && (
-            <div className="flex items-center gap-2 text-[#8f8a80] text-sm">
-              <div className="w-4 h-4 border-2 border-[#f5a623]/20 border-t-[#f5a623] rounded-full animate-spin" />
-              Thinking across your sources...
-            </div>
+          {asking && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#fbf9f3] border border-[#eceae4] rounded-2xl rounded-tl-sm p-5"
+              style={{ borderTop: `2px solid ${modeInfo?.color || '#f5a623'}40` }}
+            >
+              {/* Mode label */}
+              <div className="flex items-center gap-2 mb-4">
+                {modeInfo && <modeInfo.icon size={12} style={{ color: modeInfo.color }} />}
+                <span className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: modeInfo?.color || '#f5a623' }}>
+                  {modeInfo?.label || session.mode}
+                </span>
+                <div className="flex gap-1 ml-1">
+                  {[0, 1, 2].map(i => (
+                    <span
+                      key={i}
+                      className="block w-1 h-1 rounded-full"
+                      style={{ backgroundColor: modeInfo?.color || '#f5a623', animation: 'bounce 1.2s ease-in-out infinite', animationDelay: `${i * 0.2}s` }}
+                    />
+                  ))}
+                </div>
+              </div>
+              {/* Skeleton lines */}
+              <div className="space-y-2.5">
+                <div className="h-3 rounded-full bg-[#eceae4] animate-pulse" style={{ width: '92%' }} />
+                <div className="h-3 rounded-full bg-[#eceae4] animate-pulse" style={{ width: '78%', animationDelay: '0.1s' }} />
+                <div className="h-3 rounded-full bg-[#eceae4] animate-pulse" style={{ width: '85%', animationDelay: '0.2s' }} />
+                <div className="h-3 rounded-full bg-[#eceae4] animate-pulse" style={{ width: '60%', animationDelay: '0.3s' }} />
+              </div>
+              <p className="text-[#8f8a80] text-xs mt-3">{streamingText ? 'Generating response…' : 'Thinking across your sources…'}</p>
+            </motion.div>
           )}
         </div>
       </div>

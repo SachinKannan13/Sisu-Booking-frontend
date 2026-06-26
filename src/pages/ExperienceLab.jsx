@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FlaskConical, Sparkles, Play, Save, BookOpen, Plus, CheckCircle, XCircle } from 'lucide-react';
+import { FlaskConical, Sparkles, Play, Save, BookOpen, Plus, CheckCircle, XCircle, Clapperboard } from 'lucide-react';
 import Navbar from '../components/layout/Navbar.jsx';
 import Modal from '../components/ui/Modal.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card.jsx';
@@ -10,8 +10,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/ui/shadcn/button.jsx';
 import {
   designExperiment, saveExperiment, getExperiments,
-  updateExperiment, captureExperimentLessons, addObservation
+  updateExperiment, captureExperimentLessons, addObservation, runSimulation
 } from '../lib/api.js';
+import SimulationView from '../features/simulation/SimulationView.jsx';
 import toast from 'react-hot-toast';
 
 // Module-level cache — survives tab switches
@@ -54,6 +55,7 @@ export default function ExperienceLab() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('design');
   const [principle, setPrinciple] = useState('');
+  const [lens, setLens] = useState('life');
   const [draft, setDraft] = useState(location.state?.draft || null);
   const [sessionId] = useState(location.state?.sessionId || null);
   const [designing, setDesigning] = useState(false);
@@ -66,6 +68,8 @@ export default function ExperienceLab() {
   const [observeTarget, setObserveTarget] = useState(null);
   const [newObservation, setNewObservation] = useState('');
   const [addingObs, setAddingObs] = useState(false);
+  const [simulating, setSimulating] = useState(false);
+  const [simulation, setSimulation] = useState(null);
 
   const fetchExperiments = useCallback(async (silent = false) => {
     if (!silent) setLoading(_labCache ? false : true);
@@ -84,6 +88,10 @@ export default function ExperienceLab() {
 
   useEffect(() => {
     if (location.state?.draft) setActiveTab('design');
+    if (location.state?.prefillExperiment) {
+      setPrinciple(location.state.prefillExperiment);
+      setActiveTab('design');
+    }
     if (_labCache && Date.now() - _labCacheTime < LAB_CACHE_TTL) {
       setLoading(false);
       fetchExperiments(true);
@@ -96,13 +104,31 @@ export default function ExperienceLab() {
     if (!principle.trim()) return toast.error('Describe the principle you want to test');
     setDesigning(true);
     try {
-      const { data } = await designExperiment({ principle: principle.trim() });
+      const { data } = await designExperiment({ principle: principle.trim(), lens });
       setDraft(data.experiment_draft);
     } catch (err) {
       toast.error(err.message || 'Failed to design experiment');
     } finally {
       setDesigning(false);
     }
+  };
+
+  const handleRunSimulation = async () => {
+    if (!principle.trim()) return toast.error('Describe a principle to simulate');
+    setSimulating(true);
+    try {
+      const { data } = await runSimulation({ principle: principle.trim(), lens });
+      setSimulation(data.simulation);
+    } catch (err) {
+      toast.error(err.message || 'Simulation failed — please try again');
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const handleSimSendToLab = (experiment) => {
+    setSimulation(null);
+    setPrinciple(experiment);
   };
 
   const handleSaveToLab = async () => {
@@ -218,18 +244,54 @@ export default function ExperienceLab() {
             <textarea
               value={principle}
               onChange={(e) => setPrinciple(e.target.value)}
-              placeholder="e.g. Time-boxing deep work sessions improves output quality"
+              placeholder="e.g. 'The obstacle is the way' — from Stoicism, a fantasy epic, a biography, or any book..."
               rows={3}
               className="w-full bg-[#fbf9f3] border border-[#eceae4] rounded-xl p-4 text-[#1c1c1c] text-sm placeholder:text-[#8f8a80] focus:outline-none focus:border-[#f5a623]/50 resize-none mb-4"
             />
-            <Button
-              onClick={handleDesign}
-              disabled={designing}
-              className="bg-[#2d6a8f] hover:bg-[#245a78] text-white font-semibold h-10"
-            >
-              <Sparkles size={15} className="mr-2" />
-              {designing ? 'Designing...' : 'Design Experiment'}
-            </Button>
+            {/* Lens selector */}
+            <div className="mb-4">
+              <p className="text-[#8f8a80] text-xs font-semibold uppercase tracking-wider mb-2">Apply through the lens of</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'life',          label: 'Life & Living',      color: '#2d6a4f' },
+                  { id: 'relationships', label: 'Relationships',       color: '#7b5ea7' },
+                  { id: 'habits',        label: 'Habits & Self',       color: '#1a3a5c' },
+                  { id: 'career',        label: 'Career & Work',       color: '#4a6fa5' },
+                  { id: 'creativity',    label: 'Creativity & Making', color: '#c85250' },
+                  { id: 'community',     label: 'Community',           color: '#5a8a60' },
+                  { id: 'business',      label: 'Business & Venture',  color: '#a05c2e' },
+                ].map(l => (
+                  <button
+                    key={l.id}
+                    onClick={() => setLens(l.id)}
+                    style={{ borderColor: lens === l.id ? l.color : undefined, color: lens === l.id ? l.color : undefined, background: lens === l.id ? `${l.color}12` : undefined }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${lens === l.id ? 'font-semibold' : 'border-[#eceae4] text-[#5f5f5d]'}`}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleDesign}
+                disabled={designing || simulating}
+                className="bg-[#2d6a8f] hover:bg-[#245a78] text-white font-semibold h-10 flex-1"
+              >
+                <Sparkles size={15} className="mr-2" />
+                {designing ? 'Designing…' : 'Design Experiment'}
+              </Button>
+              <Button
+                onClick={handleRunSimulation}
+                disabled={simulating || designing}
+                variant="outline"
+                className="h-10 border-[#1c1c1c] text-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white font-semibold flex-shrink-0"
+                title="See this principle play out as a cinematic story"
+              >
+                <Clapperboard size={15} className="mr-1.5" />
+                {simulating ? 'Simulating…' : 'See it play out'}
+              </Button>
+            </div>
 
             {draft && (
               <motion.div
@@ -519,6 +581,17 @@ export default function ExperienceLab() {
           </div>
         )}
       </Modal>
+
+      {/* ── Simulation overlay ── */}
+      <AnimatePresence>
+        {simulation && (
+          <SimulationView
+            simulation={simulation}
+            onClose={() => setSimulation(null)}
+            onSendToLab={handleSimSendToLab}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

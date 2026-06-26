@@ -52,6 +52,7 @@ export const getRecentBook = () =>
   api.get('/api/books', { params: { recent: '1' } });
 
 export const getBook = (id) => api.get(`/api/books/${id}`);
+export const deleteBook = (id) => api.delete(`/api/books/${id}`);
 
 export const getBookStatus = (id) => api.get(`/api/books/${id}/status`);
 

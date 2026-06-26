@@ -8,7 +8,7 @@ import BookUpload from '../components/book/BookUpload.jsx';
 import URLIngester from '../components/source/URLIngester.jsx';
 import TextIngester from '../components/source/TextIngester.jsx';
 import Modal from '../components/ui/Modal.jsx';
-import { getBooksSlim, getSessions, getStudyRecommendations, getBookStatus, groupBySourceType } from '../lib/api.js';
+import { getBooksSlim, getSessions, getStudyRecommendations, getBookStatus, groupBySourceType, deleteBook } from '../lib/api.js';
 import { LEARNING_MODES, SOURCE_TYPE_COLORS } from '../constants/learningModes.js';
 import toast from 'react-hot-toast';
 
@@ -79,24 +79,78 @@ function FilterPill({ active, onClick, label, color, count }) {
   );
 }
 
-function StripBookCard({ book, onClick }) {
+function StripBookCard({ book, onClick, onDelete }) {
   const color = book.cover_color || '#1a3a5c';
   const isReady = book.status === 'ready';
+  const [hovered, setHovered] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleConfirmDelete = async (e) => {
+    e.stopPropagation();
+    setDeleting(true);
+    try { await onDelete(book.id); } finally { setDeleting(false); setConfirmDelete(false); }
+  };
+
   return (
     <motion.div
       whileHover={{ y: -4, boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => { setHovered(false); if (!confirmDelete) setConfirmDelete(false); }}
       onClick={onClick}
       style={{
         width: '140px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden',
         border: '1px solid #eceae4', cursor: 'pointer', background: '#fbf9f3',
-        transition: 'all 0.2s'
+        transition: 'all 0.2s', position: 'relative'
       }}
     >
       <div style={{
         width: '140px', height: '140px', position: 'relative',
         background: `linear-gradient(160deg, ${color}ee 0%, ${color}66 100%)`
       }}>
-        {!isReady && (
+        {/* Delete button — shown on hover */}
+        {onDelete && !confirmDelete && (
+          <motion.button
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
+            title="Delete"
+            style={{
+              position: 'absolute', top: '6px', right: '6px',
+              width: '24px', height: '24px', borderRadius: '50%',
+              background: 'rgba(0,0,0,0.50)', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fbf9f3', pointerEvents: hovered ? 'auto' : 'none', zIndex: 2
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </motion.button>
+        )}
+        {/* Confirm overlay */}
+        {confirmDelete && (
+          <div onClick={(e) => e.stopPropagation()} style={{
+            position: 'absolute', inset: 0, background: 'rgba(30,10,10,0.82)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: '8px', padding: '10px', zIndex: 3
+          }}>
+            <p style={{ color: '#fbf9f3', fontSize: '11px', textAlign: 'center', lineHeight: 1.4 }}>Delete this book?</p>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={handleConfirmDelete} disabled={deleting} style={{
+                padding: '4px 10px', borderRadius: '5px', border: 'none',
+                background: '#c85250', color: '#fff', fontSize: '11px',
+                fontWeight: 600, cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.7 : 1
+              }}>{deleting ? '…' : 'Delete'}</button>
+              <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(false); }} style={{
+                padding: '4px 10px', borderRadius: '5px',
+                border: '1px solid rgba(255,255,255,0.3)', background: 'transparent',
+                color: '#fbf9f3', fontSize: '11px', cursor: 'pointer'
+              }}>Cancel</button>
+            </div>
+          </div>
+        )}
+        {!isReady && !confirmDelete && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(247,244,237,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '20px', height: '20px', borderRadius: '50%',
@@ -139,7 +193,7 @@ function AddSourceCard({ onClick }) {
   );
 }
 
-function SourceTypeStrip({ sourceType, books, color, onBookClick, onAddClick }) {
+function SourceTypeStrip({ sourceType, books, color, onBookClick, onAddClick, onDelete }) {
   if (!books.length) return null;
   return (
     <div style={{ marginBottom: '28px' }}>
@@ -150,7 +204,7 @@ function SourceTypeStrip({ sourceType, books, color, onBookClick, onAddClick }) 
       </div>
       <div className="no-scrollbar strip-scroll" style={{ display: 'flex', gap: '12px', overflowX: 'auto', padding: '4px 24px 8px' }}>
         {books.map(book => (
-          <StripBookCard key={book.id} book={book} onClick={() => onBookClick(book)} />
+          <StripBookCard key={book.id} book={book} onClick={() => onBookClick(book)} onDelete={onDelete} />
         ))}
         <AddSourceCard onClick={onAddClick} />
       </div>
@@ -272,6 +326,18 @@ export default function Library() {
     fetchAll(false);
   };
 
+  const handleDeleteBook = async (bookId) => {
+    try {
+      await deleteBook(bookId);
+      // Remove from local state immediately — no refetch needed
+      _booksCache = null;
+      setBooks(prev => prev.filter(b => b.id !== bookId));
+      toast.success('Book deleted');
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to delete book');
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f7f4ed' }}>
@@ -380,6 +446,7 @@ export default function Library() {
                 color={SOURCE_TYPE_COLORS[sourceType] || '#5f5f5d'}
                 onBookClick={(book) => navigate(`/source/${book.id}`)}
                 onAddClick={() => setUploadOpen(true)}
+                onDelete={handleDeleteBook}
               />
             ))
           )}
@@ -405,6 +472,7 @@ export default function Library() {
                     onClick={() => navigate(`/source/${book.id}`)}
                     showConnectionReason={!!book.connection_reason}
                     connectionReason={book.connection_reason || 'In your canon'}
+                    onDelete={handleDeleteBook}
                   />
                 ))}
             </div>

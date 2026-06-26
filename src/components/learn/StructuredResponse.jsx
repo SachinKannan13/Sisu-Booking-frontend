@@ -68,10 +68,10 @@ function FollowupChips({ questions, onPick }) {
               variant="ghost"
               size="sm"
               onClick={() => onPick(q)}
-              className="w-full justify-start text-left text-xs text-[#5f5f5d] hover:text-[#1c1c1c] hover:bg-[#f3efe4] h-auto py-2 px-3 font-normal leading-relaxed"
+              className="w-full justify-start text-left text-xs text-[#5f5f5d] hover:text-[#1c1c1c] hover:bg-[#f3efe4] h-auto py-2 px-3 font-normal leading-relaxed overflow-hidden"
             >
               <span className="mr-2 text-[#f5a623] shrink-0">→</span>
-              {q}
+              <span className="break-words min-w-0 text-left whitespace-normal">{q}</span>
             </Button>
           </motion.div>
         ))}
